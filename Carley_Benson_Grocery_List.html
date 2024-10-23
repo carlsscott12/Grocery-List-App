@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Grocery List App</title>
+  <!-- Bootstrap CSS CDN -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-ENjdO4Dr2bkBIFxQpeoA6aHvkz9I8r6LZ6zMIhY3U5P4x4xjzh0aE5JgmXg7K5+K"
+    crossorigin="anonymous"
+  >
+  <!-- Vue.js CDN -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+  <div id="app" class="container my-5">
+    <h1 class="text-center mb-4">Grocery List</h1>
+    
+    <!-- Input Form -->
+    <div class="row mb-4">
+      <div class="col-md-5">
+        <input 
+          type="text" 
+          class="form-control" 
+          placeholder="Enter grocery item" 
+          v-model="newItem.name"
+          @keyup.enter="addItem"
+        >
+      </div>
+      <div class="col-md-3">
+        <input 
+          type="number" 
+          class="form-control" 
+          placeholder="Quantity" 
+          v-model.number="newItem.quantity"
+          min="1"
+          @keyup.enter="addItem"
+        >
+      </div>
+      <div class="col-md-4">
+        <button 
+          class="btn btn-primary w-100" 
+          @click="addItem"
+        >
+          Add Item
+        </button>
+      </div>
+    </div>
+    
+    <!-- Grocery List -->
+    <ul class="list-group">
+      <li 
+        class="list-group-item d-flex justify-content-between align-items-center"
+        v-for="(item, index) in items" 
+        :key="index"
+      >
+        <div class="form-check">
+          <input 
+            class="form-check-input me-2" 
+            type="checkbox" 
+            v-model="item.done" 
+            :id="'item-' + index"
+          >
+          <label 
+            class="form-check-label" 
+            :for="'item-' + index"
+            :class="{ 'text-decoration-line-through': item.done }"
+          >
+            {{ item.name }} ({{ item.quantity }})
+          </label>
+        </div>
+        <button 
+          class="btn btn-danger btn-sm" 
+          @click="removeItem(index)"
+        >
+          Delete
+        </button>
+      </li>
+      <li 
+        v-if="items.length === 0" 
+        class="list-group-item text-center text-muted"
+      >
+        No items in the list. Add some groceries!
+      </li>
+    </ul>
+  </div>
+
+  <!-- Vue.js Application Script -->
+  <script>
+    const { createApp } = Vue;
+
+    createApp({
+      data() {
+        return {
+          newItem: {
+            name: '',
+            quantity: 1
+          },
+          items: []
+        };
+      },
+      methods: {
+        addItem() {
+          // Validate input
+          if (this.newItem.name.trim() === '') {
+            alert('Please enter a grocery item.');
+            return;
+          }
+          if (this.newItem.quantity < 1) {
+            alert('Quantity must be at least 1.');
+            return;
+          }
+          // Add the new item to the list
+          this.items.push({
+            name: this.newItem.name.trim(),
+            quantity: this.newItem.quantity,
+            done: false
+          });
+          // Reset the input fields
+          this.newItem.name = '';
+          this.newItem.quantity = 1;
+        },
+        removeItem(index) {
+          if (confirm(`Are you sure you want to delete "${this.items[index].name}"?`)) {
+            this.items.splice(index, 1);
+          }
+        }
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
